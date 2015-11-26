@@ -1,0 +1,24 @@
+app:
+  container_name: app
+  restart: always
+  build: .
+  volumes:
+    - ..:/srv/flask_docker_deploy
+  environment:
+    - "SERVER_NAME=localhost:8001"
+  expose:
+    - "8001"
+  command: gunicorn runserver:app -b :8001 -w 4 --log-level debug --error-logfile /dev/stdout --access-logfile /dev/stdout
+
+nginx:
+  container_name: nginx
+  restart: always
+  image: nginx:1.9
+  ports:
+    - "80:80"
+  expose:
+    - "80"
+  volumes_from:
+    - app
+  volumes:
+    - ./nginx/flask_docker_deploy.conf:/etc/nginx/conf.d/default.conf
